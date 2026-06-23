@@ -36,6 +36,8 @@
     flex-direction: column;
   }
   ::selection { background: rgba(70,240,155,0.22); color: var(--fog); }
+  #rain { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none; }
+  main, footer { position: relative; z-index: 1; }
   main {
     flex: 1;
     display: flex;
@@ -125,6 +127,7 @@
 </style>
 </head>
 <body>
+<canvas id="rain" aria-hidden="true"></canvas>
 <main>
   <div class="lock">
     <svg width="26" height="26" viewBox="0 0 37 37" role="img" aria-label="Chausar mark" xmlns="http://www.w3.org/2000/svg">
@@ -157,6 +160,54 @@
 </footer>
 
 <script>
+  // logo-tile rain: a bright fog "decision" head falling into a trail of phosphor "consequence" tiles
+  (function () {
+    var canvas = document.getElementById('rain');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var COURT = '#070809', PHOS = '#46F09B', FOG = '#E8EBEE';
+    var step = 42, tile = 14, rad = 4, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var cols = 0, drops = [];
+    function resize() {
+      canvas.width = Math.floor(innerWidth * dpr);
+      canvas.height = Math.floor(innerHeight * dpr);
+      canvas.style.width = innerWidth + 'px';
+      canvas.style.height = innerHeight + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cols = Math.ceil(innerWidth / step);
+      drops = [];
+      for (var i = 0; i < cols; i++) drops[i] = Math.floor(Math.random() * (innerHeight / step));
+      ctx.fillStyle = COURT; ctx.fillRect(0, 0, innerWidth, innerHeight);
+    }
+    function rounded(x, y, s, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + s, y, x + s, y + s, r);
+      ctx.arcTo(x + s, y + s, x, y + s, r);
+      ctx.arcTo(x, y + s, x, y, r);
+      ctx.arcTo(x, y, x + s, y, r);
+      ctx.closePath(); ctx.fill();
+    }
+    function frame() {
+      ctx.fillStyle = 'rgba(7,8,9,0.09)';            // fade prior tiles toward court -> trailing dim
+      ctx.fillRect(0, 0, innerWidth, innerHeight);
+      for (var i = 0; i < cols; i++) {
+        var x = i * step + (step - tile) / 2, y = drops[i] * step;
+        if (Math.random() < 0.06) { ctx.globalAlpha = 0.55; ctx.fillStyle = FOG; }   // the decision
+        else { ctx.globalAlpha = 0.3; ctx.fillStyle = PHOS; }                         // the consequence
+        rounded(x, y, tile, rad);
+        ctx.globalAlpha = 1;
+        if (y > innerHeight && Math.random() > 0.985) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+    resize();
+    addEventListener('resize', resize);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;  // static court, no rain
+    var last = 0;
+    (function loop(t) { if (t - last > 90) { frame(); last = t; } requestAnimationFrame(loop); })(0);
+  })();
+
   (function () {
     var form = document.getElementById('capture');
     var msg = document.getElementById('form-msg');
