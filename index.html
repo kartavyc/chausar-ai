@@ -1,212 +1,428 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chausar AI — Coming Soon</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 37 37'%3E%3Crect x='0' y='0' width='18' height='18' rx='4.5' fill='%23343C2B'/%3E%3Crect x='19' y='19' width='18' height='18' rx='4.5' fill='%23A8833B'/%3E%3C/svg%3E">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --white:  #FFFFFF;
-      --banyan: #343C2B;
-      --peepal: #262C1F;
-      --lichen: #4D5440;
-      --brass:  #A8833B;
-      --sage:   #A9B393;
-      --sans: 'Figtree', system-ui, sans-serif;
-      --mono: 'IBM Plex Mono', ui-monospace, monospace;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; }
-    .page {
-      position: relative;
-      min-height: 100vh;
-      background: var(--white);
-      font-family: var(--sans);
-      color: var(--peepal);
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 64px;
-    }
-    .page > * { position: relative; z-index: 1; }
-    #rain { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-    .lockup { display: inline-flex; align-items: center; gap: 0.62em; margin-top: 8px; }
-    .wordmark { font-family: var(--sans); font-weight: 500; color: var(--banyan); letter-spacing: -0.012em; line-height: 1; font-size: 26px; }
-    .center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-    .headline { font-family: var(--sans); font-weight: 500; color: var(--banyan); letter-spacing: -0.022em; line-height: 1.04; text-wrap: balance; margin: 0; font-size: 58px; max-width: 720px; }
-    .status { font-family: var(--mono); font-weight: 400; color: var(--lichen); font-size: 13px; letter-spacing: 0.01em; margin: 22px 0 0; }
-    .note { font-family: var(--sans); font-weight: 400; color: var(--lichen); font-size: 16px; line-height: 1.5; margin: 0 0 18px; max-width: 440px; }
-    .capture { display: flex; align-items: stretch; gap: 10px; justify-content: center; }
-    .capture input[type="email"] {
-      font-family: var(--sans); font-weight: 400; font-size: 16px; color: var(--peepal);
-      background: var(--white); border: 1px solid var(--sage); border-radius: 7px;
-      padding: 0 16px; height: 46px; width: 320px; outline: none;
-      transition: border-color 0.16s ease, box-shadow 0.16s ease;
-    }
-    .capture input[type="email"]::placeholder { color: var(--lichen); opacity: 0.62; }
-    .capture input[type="email"]:focus { border-color: var(--banyan); box-shadow: 0 0 0 3px rgba(169,179,147,0.28); }
-    .capture button {
-      font-family: var(--sans); font-weight: 500; font-size: 15px; letter-spacing: 0.005em;
-      color: var(--white); background: var(--brass); border: none; border-radius: 7px;
-      padding: 0 22px; height: 46px; cursor: pointer; flex: 0 0 auto; white-space: nowrap;
-      transition: background-color 0.16s ease, opacity 0.16s ease;
-    }
-    .capture button:hover { background: #97712f; }
-    .capture button:disabled { opacity: 0.55; cursor: default; }
-    .capture-msg { font-family: var(--mono); font-size: 13px; letter-spacing: 0.01em; margin-top: 14px; min-height: 20px; }
-    .capture-msg.success { color: var(--banyan); }
-    .capture-msg.error   { color: #9b3030; }
-    footer { display: flex; flex-direction: column; align-items: center; gap: 22px; }
-    .epigraph { font-family: var(--sans); font-weight: 500; color: var(--lichen); font-size: 14.5px; line-height: 1.55; margin: 0; max-width: 380px; text-wrap: pretty; text-align: center; }
-    .contacts { display: grid; grid-template-columns: auto auto; column-gap: 16px; row-gap: 8px; }
-    .contact-label { font-family: var(--mono); font-weight: 400; font-size: 12.5px; color: #828772; letter-spacing: 0.01em; white-space: nowrap; }
-    .contact-email { font-family: var(--mono); font-weight: 400; font-size: 12.5px; color: var(--lichen); text-decoration: none; border-bottom: 1px solid rgba(169,179,147,0.5); padding-bottom: 1px; width: fit-content; transition: border-color 0.15s ease, color 0.15s ease; }
-    .contact-email:hover { color: var(--banyan); border-bottom-color: var(--banyan); }
-    .copyright { font-family: var(--mono); font-weight: 400; color: var(--lichen); font-size: 12px; letter-spacing: 0.01em; margin: 0; }
-    @media (max-width: 640px) {
-      .page { padding: 40px 24px; }
-      .headline { font-size: 36px; }
-      .capture { flex-direction: column; align-items: stretch; width: 100%; max-width: 360px; }
-      .capture input[type="email"] { width: 100%; }
-      .capture button { width: 100%; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chausar AI: decision intelligence for organisations</title>
+<meta name="description" content="Chausar AI. A temporal, provenance-rich record of what an organisation decided, when, by whom, and on what stated reasoning. Built in India.">
+<meta property="og:title" content="Chausar AI: decision intelligence for organisations">
+<meta property="og:description" content="The memory organisations lose. A queryable, auditable record of decisions and their stated reasoning. Built in India.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#070809">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect width='44' height='44' rx='10' fill='%23070809'/%3E%3Cg transform='translate(3.5,3.5)'%3E%3Crect x='0' y='0' width='18' height='18' rx='4.5' fill='%23E8EBEE'/%3E%3Crect x='19' y='19' width='18' height='18' rx='4.5' fill='%2346F09B'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --court:   #070809;  /* page ground */
+    --panel:   #0B0E10;  /* elevated card */
+    --hair:    #171B1F;  /* hairline border */
+    --hair2:   #232A2F;  /* brighter hairline / hover */
+    --phos:    #46F09B;  /* the single scarce accent */
+    --fog:     #E8EBEE;  /* primary text */
+    --mist:    #8B9197;  /* muted text, labels */
+    --dim:     #5E6660;  /* faintest text */
+    --amber:   #E0A43C;  /* caution */
+    --error:   #E24B4A;  /* errors only */
+    --sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    font-weight: 400;
+    color: var(--fog);
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* fixed court ground, like the product */
+  .ground { position: fixed; inset: 0; background: var(--court); z-index: -1; }
+  ::selection { background: rgba(70,240,155,0.22); color: var(--fog); }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 28px; }
+  a { color: inherit; }
+
+  /* ---------- header ---------- */
+  header.site {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    height: 64px;
+    border-bottom: 0.5px solid var(--hair);
+  }
+  .lock { display: flex; align-items: center; gap: 10px; }
+  .lock svg { display: block; }
+  .lock span { font-family: var(--mono); font-weight: 500; font-size: 15px; color: var(--fog); }
+  .siglabel { font-family: var(--mono); font-size: 11px; color: var(--mist); letter-spacing: 0.01em; }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 92px 0 64px; }
+  .kicker { font-family: var(--mono); font-size: 12px; color: var(--mist); margin-bottom: 22px; }
+  .kicker .dot { color: var(--phos); padding: 0 0.5em; }
+  h1 {
+    font-weight: 600;
+    font-size: clamp(2.1rem, 6.2vw, 3.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    color: var(--fog);
+    margin-bottom: 24px;
+  }
+  h1 .line { display: block; }
+  .sub {
+    font-size: clamp(1.02rem, 1.8vw, 1.18rem);
+    color: var(--mist);
+    max-width: 48ch;
+    margin-bottom: 36px;
+  }
+  .sub strong { font-weight: 500; color: var(--fog); }
+
+  /* hero temporal graph */
+  .graphbox { margin: 8px 0 4px; }
+  .graph { width: 100%; max-width: 460px; height: auto; display: block; }
+  .graph text { font-family: var(--mono); }
+  .replay {
+    margin-top: 8px; font-family: var(--mono); font-size: 11px; color: var(--dim);
+    background: none; border: none; cursor: pointer; padding: 4px 0;
+  }
+  .replay:hover { color: var(--phos); }
+
+  /* ---------- sections ---------- */
+  section.sec { padding: 56px 0; border-top: 0.5px solid var(--hair); }
+  .eyebrow { font-family: var(--mono); font-size: 11px; color: var(--mist); margin-bottom: 18px; }
+  .eyebrow b { color: var(--fog); font-weight: 500; }
+  h2 {
+    font-weight: 600;
+    font-size: clamp(1.4rem, 3.4vw, 1.95rem);
+    line-height: 1.18;
+    letter-spacing: -0.018em;
+    color: var(--fog);
+    margin-bottom: 18px;
+    max-width: 24ch;
+  }
+  .body p { margin-bottom: 16px; max-width: 62ch; color: var(--mist); }
+  .body p strong { color: var(--fog); font-weight: 500; }
+
+  /* pull stat (one phosphor number) */
+  .stat { margin: 30px 0 8px; }
+  .stat .big {
+    font-family: var(--mono); font-weight: 500;
+    font-size: clamp(2.4rem, 6vw, 3.4rem);
+    line-height: 1; letter-spacing: -0.02em;
+    color: var(--phos); display: block;
+  }
+  .stat .cap {
+    font-family: var(--mono); font-size: 12px; color: var(--mist);
+    display: block; margin-top: 12px; max-width: 46ch; line-height: 1.5;
+  }
+
+  /* cited facts + source links */
+  .cites { list-style: none; margin: 20px 0 6px; display: grid; gap: 11px; }
+  .cites li {
+    font-family: var(--mono); font-size: 12.5px; color: var(--mist);
+    line-height: 1.55; max-width: 58ch; padding-left: 16px; position: relative;
+  }
+  .cites li::before { content: ""; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; background: var(--hair2); border-radius: 1px; transform: rotate(45deg); }
+  .cites b { color: var(--fog); font-weight: 500; }
+  .cites a, .stat a, .body p a { color: var(--mist); text-decoration: none; border-bottom: 1px solid var(--hair2); }
+  .cites a:hover, .stat a:hover, .body p a:hover { color: var(--fog); border-color: var(--mist); }
+
+  /* ordered capabilities */
+  .steps { list-style: none; margin-top: 8px; }
+  .steps li {
+    position: relative; padding: 4px 0 30px 34px;
+    border-left: 0.5px solid var(--hair); margin-left: 7px;
+  }
+  .steps li:last-child { border-left-color: transparent; padding-bottom: 4px; }
+  .steps li::before {
+    content: ""; position: absolute; left: -7px; top: 9px;
+    width: 13px; height: 13px; border-radius: 3.5px;
+    background: var(--court); border: 1.5px solid var(--mist);
+    transform: rotate(45deg);
+  }
+  .steps li.earned::before { background: var(--phos); border-color: var(--phos); }
+  .steps .k { font-family: var(--mono); font-size: 11px; color: var(--mist); display: block; margin-bottom: 7px; }
+  .steps h3 { font-weight: 600; font-size: 1.18rem; color: var(--fog); margin-bottom: 7px; letter-spacing: -0.01em; }
+  .steps p { max-width: 58ch; color: var(--mist); }
+
+  /* query board */
+  .board { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 26px 0 18px; }
+  .cell {
+    border: 0.5px solid var(--hair); border-radius: 12px;
+    padding: 20px; background: var(--panel);
+    transition: border-color .25s ease, transform .25s ease;
+  }
+  .cell:hover { border-color: var(--hair2); transform: translateY(-2px); }
+  .cell .k { font-family: var(--mono); font-size: 11px; color: var(--mist); display: block; margin-bottom: 11px; }
+  .cell h3 { font-weight: 600; font-size: 1.05rem; color: var(--fog); margin-bottom: 9px; letter-spacing: -0.01em; }
+  .cell p { font-family: var(--mono); font-size: 12.5px; color: var(--mist); line-height: 1.55; }
+
+  /* closing capture */
+  .close { border-top: 0.5px solid var(--hair); padding: 64px 0 8px; }
+  .close .mark { margin-bottom: 24px; display: block; }
+  .close h2 { max-width: 22ch; margin-bottom: 14px; }
+  .close p.lead { color: var(--mist); max-width: 52ch; margin-bottom: 28px; }
+  form { display: flex; gap: 10px; flex-wrap: wrap; max-width: 460px; }
+  input[type="email"] {
+    flex: 1 1 230px; font-family: var(--sans); font-size: 1rem;
+    padding: 12px 15px; border: 0.5px solid var(--hair2); border-radius: 8px;
+    color: var(--fog); background: var(--panel); outline: none;
+    transition: border-color .2s ease;
+  }
+  input[type="email"]:focus { border-color: var(--phos); }
+  input[type="email"]::placeholder { color: var(--dim); }
+  button {
+    font-family: var(--sans); font-weight: 500; font-size: 1rem;
+    padding: 12px 24px; border: none; border-radius: 8px;
+    background: var(--phos); color: var(--court); cursor: pointer;
+    transition: transform .15s ease, opacity .2s ease;
+  }
+  button:hover { transform: translateY(-1px); }
+  button:active { transform: scale(.98); }
+  button:disabled { opacity: 0.55; cursor: default; transform: none; }
+  .form-msg { font-family: var(--mono); font-size: 13px; margin-top: 14px; color: var(--phos); min-height: 1.4em; }
+  .form-msg.error { color: var(--error); }
+  .myth { font-family: var(--mono); font-size: 12.5px; color: var(--mist); margin-top: 30px; max-width: 48ch; line-height: 1.6; }
+  .hp { position: absolute; left: -9999px; }
+
+  footer {
+    border-top: 0.5px solid var(--hair); margin-top: 56px;
+    padding: 24px 0 48px;
+    font-family: var(--mono); font-size: 11.5px; color: var(--mist);
+    display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between;
+  }
+  footer a:hover { color: var(--mist); }
+
+  /* scroll reveal + one-shot graph cascade */
+  .edge { stroke: var(--hair2); stroke-width: 1.5; }
+  .node { fill: var(--hair2); }
+  .seed { fill: var(--phos); }
+  .reveal { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { opacity: 0; transform: translateY(14px); transition: opacity .55s ease-out, transform .55s cubic-bezier(.2,.6,.2,1); }
+    .reveal.in { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 640px) {
+    .board { grid-template-columns: 1fr; }
+    .hero { padding: 64px 0 48px; }
+  }
+</style>
 </head>
 <body>
-  <div class="page">
-    <canvas id="rain" aria-hidden="true"></canvas>
-    <header class="lockup">
-      <svg viewBox="0 0 37 37" width="28" height="28" aria-hidden="true">
-        <rect x="0" y="0" width="18" height="18" rx="4.5" fill="#343C2B"></rect>
-        <rect x="19" y="19" width="18" height="18" rx="4.5" fill="#A8833B"></rect>
-      </svg>
-      <span class="wordmark">Chausar</span>
-    </header>
-    <div class="center">
-      <h1 class="headline">Decision intelligence for organisations</h1>
-      <p class="status">Built in India &middot; 2026</p>
-      <div style="margin-top:60px;display:flex;flex-direction:column;align-items:center;">
-        <p class="note">Leave an email. We'll write when there's something to show.</p>
-        <form class="capture" id="signup-form">
-          <input type="email" name="email" placeholder="you@organisation.com" required autocomplete="email">
-          <button type="submit" id="signup-btn">Notify me</button>
-        </form>
-        <p class="capture-msg" id="capture-msg" aria-live="polite"></p>
+<div class="ground" aria-hidden="true"></div>
+<div class="wrap">
+
+<header class="site">
+  <div class="lock">
+    <svg width="22" height="22" viewBox="0 0 37 37" role="img" aria-label="Chausar mark" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="18" height="18" rx="4.5" fill="#E8EBEE"/>
+      <rect x="19" y="19" width="18" height="18" rx="4.5" fill="#46F09B"/>
+    </svg>
+    <span>chausar</span>
+  </div>
+  <span class="siglabel">decision intelligence · built in india</span>
+</header>
+
+<div class="hero">
+  <p class="kicker">decision intelligence for organisations</p>
+  <h1>
+    <span class="line">Organisations forget.</span>
+    <span class="line">We're building the memory.</span>
+  </h1>
+  <p class="sub">A temporal, provenance-rich record of what a company decided, <strong>when, by whom, and on what stated reasoning.</strong> Built in India.</p>
+
+  <div class="graphbox">
+    <svg class="graph" id="heroGraph" viewBox="0 0 460 210" aria-label="A decision cascades into its consequences over time" xmlns="http://www.w3.org/2000/svg">
+      <!-- time axis -->
+      <line x1="24" y1="180" x2="436" y2="180" stroke="#232A2F" stroke-width="1"/>
+      <text x="24" y="199" font-size="9" fill="#5E6660">2024</text>
+      <text x="216" y="199" font-size="9" fill="#5E6660">2025</text>
+      <text x="408" y="199" font-size="9" fill="#5E6660">2026</text>
+      <!-- edges -->
+      <line class="edge e" x1="58" y1="120" x2="150" y2="62"/>
+      <line class="edge e" x1="150" y1="62" x2="258" y2="104"/>
+      <line class="edge e" x1="258" y1="104" x2="360" y2="56"/>
+      <line class="edge e" x1="258" y1="104" x2="348" y2="150"/>
+      <line class="edge" x1="150" y1="62" x2="206" y2="158"/>
+      <!-- nodes -->
+      <circle class="seed" cx="58" cy="120" r="8"/>
+      <circle class="node n" cx="150" cy="62" r="7"/>
+      <circle class="node n" cx="258" cy="104" r="7"/>
+      <circle class="node n" cx="360" cy="56" r="6"/>
+      <circle class="node n" cx="348" cy="150" r="6"/>
+      <circle class="node" cx="206" cy="158" r="6"/>
+      <text x="58" y="146" font-size="10" fill="#8B9197" text-anchor="middle">decision</text>
+      <text x="360" y="40" font-size="10" fill="#8B9197" text-anchor="middle">consequence</text>
+    </svg>
+    <button class="replay" id="replay" type="button">↻ replay</button>
+  </div>
+</div>
+
+<section class="sec">
+  <div class="eyebrow"><b>01</b> · the problem</div>
+  <div class="body reveal">
+    <h2>Every organisation above a certain size is partially amnesiac</h2>
+    <p>It carries the consequences of past decisions without any memory of why they were made. Three failures compound into this. The same supplier lives under a dozen different keys in a dozen systems, and nothing reconciles them. Systems record states, never transitions, and never the reasoning behind a change. And most of what an organisation knows is held in people, never written down at all.</p>
+    <div class="stat">
+      <span class="big">$250M a year</span>
+      <span class="cap">is the labour a typical Fortune 500 company wastes on ineffective decision-making, roughly 530,000 manager-days. Source: <a href="https://www.mckinsey.com/capabilities/people-and-organizational-performance/our-insights/decision-making-in-the-age-of-urgency" target="_blank" rel="noopener">McKinsey, 2019</a>.</span>
+    </div>
+    <ul class="cites">
+      <li><b>$12.9M a year</b> is the average cost of poor data quality to an organisation. <a href="https://www.gartner.com/en/data-analytics/topics/data-quality" target="_blank" rel="noopener">Gartner, 2021</a></li>
+      <li><b>Nearly a fifth of the work week</b> is spent searching for information the company already holds somewhere. <a href="https://www.mckinsey.com/industries/technology-media-and-telecommunications/our-insights/the-social-economy" target="_blank" rel="noopener">McKinsey, 2012</a></li>
+    </ul>
+    <p>No system on the market treats time as a structural dimension. Everything on offer retrieves fragments of the present. None of it answers the question a CEO actually has: what changed, when, why, and what will the next decision propagate into?</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="eyebrow"><b>02</b> · what we build</div>
+  <div class="body reveal">
+    <h2>Three capabilities, in strict order</h2>
+    <ol class="steps">
+      <li>
+        <span class="k">first · ships now</span>
+        <h3>Evidence reconstruction</h3>
+        <p>Forensics on roughly two years of a company's own record: its communications, the ERP and ledger, the commerce exports. Entities, events, and decisions land in a bi-temporal knowledge graph that remembers both when something was true and when the company learned it. Every answer is auditable down to its exact source. Where the rationale was never written down, structured elicitation interviews with the executives who carry it become consented, attributed, queryable sources.</p>
+      </li>
+      <li>
+        <span class="k">second · the real product</span>
+        <h3>Live capture</h3>
+        <p>Recording decisions, exceptions, approvals, and their stated rationale at the moment they happen, before the context evaporates. This is what finally reaches the knowledge that today lives only in people.</p>
+      </li>
+      <li class="earned">
+        <span class="k">third · the headline, earned</span>
+        <h3>Simulation</h3>
+        <p>Forecasting the cross-functional ripple of a decision before it is made. Never pitched on faith. The system first runs a shadow period in which its forecasts are checked silently against what actually happens. The client sees the track record before being asked to trust a forecast.</p>
+      </li>
+    </ol>
+    <p>The order is the discipline. Simulation over a poorly resolved record produces confident nonsense, so it sits last, behind the quality layer and the validation period.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="eyebrow"><b>03</b> · the four questions</div>
+  <div class="body reveal">
+    <h2>Built around four query classes, not generic search</h2>
+    <div class="board">
+      <div class="cell">
+        <span class="k">query class · 1</span>
+        <h3>Point-in-time reconstruction</h3>
+        <p>"What did our supplier base for the snacks range look like just before Diwali 2024?"</p>
+      </div>
+      <div class="cell">
+        <span class="k">query class · 2</span>
+        <h3>Change tracing</h3>
+        <p>"When did margin on our hero SKU start slipping, and what changed near that point?"</p>
+      </div>
+      <div class="cell">
+        <span class="k">query class · 3</span>
+        <h3>Decision forensics</h3>
+        <p>"Who approved the marketplace discount, what was the stated reason, and what did it touch?"</p>
+      </div>
+      <div class="cell">
+        <span class="k">query class · 4</span>
+        <h3>Precedent search</h3>
+        <p>"Have we made this kind of pricing exception before, and what happened after?"</p>
       </div>
     </div>
-    <footer>
-      <p class="epigraph">A kingdom, lost over dice. The lesson outlived the kingdom.</p>
-      <div class="contacts">
-        <span class="contact-label">Career enquiries</span>
-        <a class="contact-email" href="mailto:careers@chausar.co.in">careers@chausar.co.in</a>
-        <span class="contact-label">Business enquiries</span>
-        <a class="contact-email" href="mailto:info@chausar.co.in">info@chausar.co.in</a>
-      </div>
-      <p class="copyright">chausar.co.in</p>
-    </footer>
+    <p>These are the questions a CEO asks today and answers by sending five people away for a week.</p>
   </div>
-  <script>
-    (function () {
-      var ENDPOINT = 'https://formspree.io/f/mykaevlg';
-      var form = document.getElementById('signup-form');
-      var btn  = document.getElementById('signup-btn');
-      var msg  = document.getElementById('capture-msg');
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        btn.disabled = true;
-        btn.textContent = 'Sending...';
-        msg.textContent = '';
-        msg.className = 'capture-msg';
-        fetch(ENDPOINT, {
+</section>
+
+</div>
+
+<div class="wrap">
+<div class="close reveal">
+  <svg class="mark" width="44" height="44" viewBox="0 0 37 37" role="img" aria-label="Chausar mark" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="18" height="18" rx="4.5" fill="#E8EBEE"/>
+    <rect x="19" y="19" width="18" height="18" rx="4.5" fill="#46F09B"/>
+  </svg>
+  <h2>Leave an email</h2>
+  <p class="lead">We're working with a small number of consumer businesses early. If that could be you, or you just want to follow along, tell us where to write.</p>
+  <form id="capture" action="https://formspree.io/f/mykaevlg" method="POST">
+    <input type="email" name="email" placeholder="you@company.com" required aria-label="Email address">
+    <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button type="submit">Notify me</button>
+  </form>
+  <p class="form-msg" id="form-msg" role="status"></p>
+  <p class="myth">Chausar is the dice game that cost a kingdom. The lesson outlived the kingdom.</p>
+</div>
+
+<footer>
+  <span>© 2026 Chausar AI · chausar.co.in</span>
+  <span>Business enquiries <a href="mailto:info@chausar.co.in">info@chausar.co.in</a> · Careers <a href="mailto:careers@chausar.co.in">careers@chausar.co.in</a></span>
+</footer>
+</div>
+
+<script>
+  // graph cascade: fires on load and on replay (Web Animations API, never loops idle)
+  (function () {
+    var svg = document.getElementById('heroGraph');
+    if (!svg) return;
+    var lits = svg.querySelectorAll('.e, .n');
+    var cs = getComputedStyle(document.documentElement);
+    var HAIR2 = cs.getPropertyValue('--hair2').trim() || '#232A2F';
+    var PHOS = cs.getPropertyValue('--phos').trim() || '#46F09B';
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function cascade() {
+      lits.forEach(function (el, i) {
+        el.getAnimations().forEach(function (a) { a.cancel(); });
+        var prop = el.classList.contains('e') ? 'stroke' : 'fill';
+        var from = {}, to = {}; from[prop] = HAIR2; to[prop] = PHOS;
+        el.animate([from, to], { duration: reduce ? 0 : 480, delay: reduce ? 0 : i * 150, easing: 'ease', fill: 'forwards' });
+      });
+    }
+    setTimeout(cascade, 300);
+    var btn = document.getElementById('replay');
+    if (btn) btn.addEventListener('click', cascade);
+  })();
+
+  // scroll reveal
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+
+  // email capture
+  (function () {
+    var form = document.getElementById('capture');
+    var msg = document.getElementById('form-msg');
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var btn = form.querySelector('button');
+      btn.disabled = true;
+      msg.textContent = '';
+      msg.classList.remove('error');
+      try {
+        var res = await fetch(form.action, {
           method: 'POST',
           body: new FormData(form),
           headers: { 'Accept': 'application/json' }
-        })
-        .then(function (res) {
-          if (res.ok) {
-            form.reset();
-            btn.textContent = 'Done';
-            msg.textContent = "You're on the list.";
-            msg.className = 'capture-msg success';
-          } else {
-            return res.json().then(function (json) {
-              throw new Error(json.errors ? json.errors.map(function(e){return e.message;}).join(', ') : 'failed');
-            });
-          }
-        })
-        .catch(function () {
-          btn.disabled = false;
-          btn.textContent = 'Notify me';
-          msg.textContent = 'Something went wrong. Try again.';
-          msg.className = 'capture-msg error';
         });
-      });
-    })();
-    (function () {
-      var canvas = document.getElementById('rain');
-      var parent = canvas.parentElement;
-      var ctx    = canvas.getContext('2d');
-      var dpr    = Math.min(window.devicePixelRatio || 1, 2);
-      var fontSize = 15;
-      var w, h, cols, drops, speed, colAlpha;
-      function setup() {
-        w = parent.clientWidth; h = parent.clientHeight;
-        canvas.width  = w * dpr; canvas.height = h * dpr;
-        canvas.style.width  = w + 'px'; canvas.style.height = h + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, w, h);
-        cols = Math.ceil(w / fontSize);
-        drops = []; speed = []; colAlpha = [];
-        for (var i = 0; i < cols; i++) {
-          drops[i]    = Math.random() * -(h / fontSize);
-          speed[i]    = 0.55 + Math.random() * 0.7;
-          colAlpha[i] = 0.35 + Math.pow(Math.random(), 1.7) * 0.65;
+        if (res.ok) {
+          form.reset();
+          msg.textContent = 'Noted. We will be in touch.';
+        } else {
+          msg.textContent = 'Something went wrong. Write to us instead: info@chausar.co.in';
+          msg.classList.add('error');
         }
+      } catch (err) {
+        msg.textContent = 'Something went wrong. Write to us instead: info@chausar.co.in';
+        msg.classList.add('error');
       }
-      setup();
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        ctx.font = '400 ' + fontSize + "px 'IBM Plex Mono', monospace";
-        ctx.textBaseline = 'top';
-        for (var i = 0; i < cols; i++) {
-          for (var r = 0; r < h / fontSize; r++) {
-            if (Math.random() < 0.18) {
-              ctx.fillStyle = 'rgba(169,179,147,' + (0.05 + 0.08 * colAlpha[i]).toFixed(3) + ')';
-              ctx.fillText(Math.random() < 0.5 ? '0' : '1', i * fontSize, r * fontSize);
-            }
-          }
-        }
-        return;
-      }
-      var last = 0, stepMs = 60;
-      function draw(t) {
-        requestAnimationFrame(draw);
-        if (t - last < stepMs) return;
-        last = t;
-        ctx.fillStyle = 'rgba(255,255,255,0.16)';
-        ctx.fillRect(0, 0, w, h);
-        ctx.font = '400 ' + fontSize + "px 'IBM Plex Mono', monospace";
-        ctx.textBaseline = 'top';
-        for (var i = 0; i < cols; i++) {
-          var a = (0.08 + 0.30 * colAlpha[i]).toFixed(3);
-          ctx.fillStyle = 'rgba(169,179,147,' + a + ')';
-          ctx.fillText(Math.random() < 0.5 ? '0' : '1', i * fontSize, drops[i] * fontSize);
-          if (drops[i] * fontSize > h && Math.random() > 0.97) {
-            drops[i] = Math.random() * -6;
-            speed[i] = 0.55 + Math.random() * 0.7;
-          }
-          drops[i] += speed[i];
-        }
-      }
-      requestAnimationFrame(draw);
-      window.addEventListener('resize', setup);
-    })();
-  </script>
+      btn.disabled = false;
+    });
+  })();
+</script>
 </body>
 </html>
