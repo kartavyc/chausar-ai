@@ -3,13 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chausar AI: decision intelligence for organisations</title>
-<meta name="description" content="Chausar AI. Decision intelligence for organisations. Built in India.">
+<!-- chausar.co.in revamp (2026-07): full public landing. Deploy: push to kartavyc/chausar-ai. -->
+<title>chausar · decision intelligence for organisations</title>
+<meta name="description" content="A queryable, auditable record of what your company decided: when, by whom, and on what stated reasoning. Built in India.">
+<meta property="og:title" content="chausar · decision intelligence for organisations">
+<meta property="og:description" content="Organisations forget. We're building the memory. Built in India.">
+<meta property="og:type" content="website">
 <meta name="theme-color" content="#070809">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect width='44' height='44' rx='10' fill='%23070809'/%3E%3Cg transform='translate(3.5,3.5)'%3E%3Crect x='0' y='0' width='18' height='18' rx='4.5' fill='%23E8EBEE'/%3E%3Crect x='19' y='19' width='18' height='18' rx='4.5' fill='%2346F09B'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<noscript><style>
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .reverify { display: none; }
+</style></noscript>
 <style>
   :root {
     --court: #070809;
@@ -19,154 +27,486 @@
     --phos:  #46F09B;
     --fog:   #E8EBEE;
     --mist:  #8B9197;
-    --dim:   #5E6660;
+    --dim:   #5E6660; /* decorative glyphs only, never text */
     --error: #E24B4A;
     --sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+    --z-nav: 10;
+    /* springy ease approximations */
+    --ease-out: cubic-bezier(.2,.6,.2,1);
+    --ease-spring: linear(0, 0.218 2.1%, 0.862 6.5%, 1.114, 1.296 10.7%, 1.346, 1.37 12.9%, 1.373, 1.364 14.5%, 1.315 16.2%, 1.032 21.8%, 0.941 24%, 0.891 25.9%, 0.877, 0.869 27.8%, 0.87, 0.882 30.7%, 0.907 32.4%, 0.981 36.4%, 1.012 38.3%, 1.036, 1.046 42.7% 44.1%, 1.042 45.7%, 0.996 53.3%, 0.988, 0.984 57.5%, 0.985 60.7%, 1.001 68.1%, 1.006 72.2%, 0.998 86.7%, 1);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
   body {
     font-family: var(--sans);
-    font-weight: 400;
-    color: var(--fog);
     background: var(--court);
+    color: var(--fog);
+    font-size: 16px;
+    line-height: 1.65;
+    letter-spacing: 0.01em;
     -webkit-font-smoothing: antialiased;
-    display: flex;
-    flex-direction: column;
+    text-rendering: optimizeLegibility;
   }
   ::selection { background: rgba(70,240,155,0.22); color: var(--fog); }
-  #rain { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none; }
-  main, footer { position: relative; z-index: 1; }
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    max-width: 640px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 48px 28px;
+  a { color: inherit; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ---------- atmosphere: tile rain + phosphor field ---------- */
+  #rain { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: .6; display: block; pointer-events: none; }
+  .field {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(680px 420px at 12% -6%, rgba(70,240,155,0.05), transparent 68%),
+      radial-gradient(760px 520px at 96% 34%, rgba(232,235,238,0.04), transparent 70%),
+      radial-gradient(600px 460px at 30% 108%, rgba(232,235,238,0.035), transparent 72%);
   }
-  .lock { display: flex; align-items: center; gap: 11px; margin-bottom: 64px; }
+  main, .footwrap { position: relative; z-index: 1; }
+
+  /* ================= hero ================= */
+  .hero {
+    min-height: 100svh;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 40px);
+  }
+  .bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 22px 0 0;
+    position: relative; z-index: var(--z-nav);
+  }
+  .lock { display: flex; align-items: center; gap: 10px; text-decoration: none; padding: 10px 6px; margin: -10px -6px; }
+  .lock:focus-visible { outline: 1.5px solid var(--phos); outline-offset: 2px; }
   .lock svg { display: block; }
-  .lock span { font-family: var(--mono); font-weight: 500; font-size: 17px; color: var(--fog); }
+  .lock span { font-family: var(--mono); font-weight: 500; font-size: 0.95rem; color: var(--fog); }
+  nav.pill {
+    display: flex; align-items: center; gap: 2px;
+    border: 0.5px solid var(--hair2);
+    background: var(--panel);
+    border-radius: 999px;
+    padding: 4px 5px;
+  }
+  nav.pill a {
+    font-weight: 500; font-size: 0.82rem; color: var(--mist);
+    text-decoration: none;
+    padding: 12px 14px; border-radius: 999px;
+    transition: color .18s ease, background-color .18s ease;
+  }
+  nav.pill a:hover { color: var(--fog); background: var(--hair); }
+  nav.pill a:focus-visible { outline: 1.5px solid var(--phos); outline-offset: 1px; color: var(--fog); }
+
+  .intro {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 32px;
+    padding: clamp(26px, 6vh, 60px) 0 0;
+  }
+  .intro .say { font-size: 0.95rem; color: var(--mist); max-width: 46ch; text-wrap: pretty; }
+  .intro .stamp { font-family: var(--mono); font-size: 0.75rem; color: var(--mist); white-space: nowrap; }
+
+  .center {
+    display: grid; place-content: center; justify-items: center;
+    text-align: center;
+    padding: clamp(30px, 6vh, 68px) 0;
+  }
+  .eyebrow { font-weight: 500; font-size: 0.9rem; color: var(--mist); margin-bottom: clamp(16px, 3vh, 28px); }
   h1 {
     font-weight: 600;
-    font-size: clamp(1.9rem, 5.2vw, 2.75rem);
-    line-height: 1.12;
-    letter-spacing: -0.025em;
-    color: var(--fog);
-    margin-bottom: 22px;
+    font-size: clamp(2.4rem, 7.2vw, 5.5rem);
+    line-height: 1.03;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    margin-bottom: clamp(28px, 5vh, 44px);
   }
-  .myth {
-    font-family: var(--mono);
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--mist);
-    max-width: 46ch;
-    margin-bottom: 30px;
+  h1 .line { display: block; }
+  .resolve { position: relative; display: block; color: var(--fog); }
+  .resolve .lit {
+    position: absolute; inset: 0;
+    color: var(--phos);
+    clip-path: inset(0 100% 0 0);
+    visibility: hidden;
   }
-  .status {
-    font-family: var(--mono);
-    font-size: 0.8125rem;
-    color: var(--mist);
-    margin-bottom: 48px;
+  @media (prefers-reduced-motion: no-preference) {
+    .resolve .lit { visibility: visible; animation: sweep 1.5s cubic-bezier(.4,0,.2,1) 1.05s forwards; }
+    @keyframes sweep {
+      0%   { clip-path: inset(0 100% 0 0); }
+      42%  { clip-path: inset(0 0 0 0); }
+      58%  { clip-path: inset(0 0 0 0); }
+      100% { clip-path: inset(0 0 0 100%); }
+    }
   }
-  .status .dot { color: var(--phos); padding: 0 0.55em; }
-  .field-note { font-size: 0.95rem; color: var(--mist); margin-bottom: 14px; }
-  form { display: flex; gap: 10px; flex-wrap: wrap; max-width: 460px; }
+
+  form.capture { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: min(460px, 100%); }
   input[type="email"] {
-    flex: 1 1 230px;
-    font-family: var(--sans);
-    font-size: 1rem;
-    padding: 12px 15px;
-    border: 0.5px solid var(--hair2);
-    border-radius: 8px;
-    color: var(--fog);
-    background: var(--panel);
+    flex: 1 1 240px;
+    font-family: var(--sans); font-size: 1rem;
+    padding: 13px 16px;
+    border: 0.5px solid var(--hair2); border-radius: 9px;
+    color: var(--fog); background: var(--panel);
     outline: none;
     transition: border-color .2s ease;
   }
   input[type="email"]:focus { border-color: var(--phos); }
-  input[type="email"]::placeholder { color: var(--dim); }
-  button {
-    font-family: var(--sans);
-    font-weight: 500;
-    font-size: 1rem;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    background: var(--phos);
-    color: var(--court);
+  input[type="email"]:focus-visible { outline: 1.5px solid var(--phos); outline-offset: 1px; }
+  input[type="email"]::placeholder { color: var(--mist); }
+  button.go {
+    font-family: var(--sans); font-weight: 500; font-size: 1rem;
+    padding: 13px 26px;
+    border: none; border-radius: 9px;
+    background: var(--phos); color: var(--court);
     cursor: pointer;
-    transition: transform .15s ease, opacity .2s ease;
+    transition: transform .45s var(--ease-spring), opacity .2s ease;
   }
-  button:hover { transform: translateY(-1px); }
-  button:active { transform: scale(.98); }
-  button:disabled { opacity: 0.55; cursor: default; transform: none; }
-  .form-msg { font-family: var(--mono); font-size: 0.8125rem; margin-top: 14px; color: var(--phos); min-height: 1.4em; }
+  button.go:hover { transform: translateY(-2px); }
+  button.go:active { transform: scale(.97); }
+  button.go:focus-visible { outline: 1.5px solid var(--fog); outline-offset: 2px; }
+  button.go:disabled { opacity: 0.55; cursor: default; transform: none; }
+  .form-msg { font-size: 0.85rem; margin-top: 14px; color: var(--fog); min-height: 1.4em; }
   .form-msg.error { color: var(--error); }
-  footer {
-    max-width: 640px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 24px 28px;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--dim);
-    border-top: 0.5px solid var(--hair);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 20px;
-    justify-content: space-between;
-  }
-  footer a { color: inherit; text-decoration: none; }
-  footer a:hover { color: var(--mist); }
+  .hint { font-size: 0.82rem; color: var(--mist); margin-top: 10px; }
   .hp { position: absolute; left: -9999px; }
+
+  .herofoot {
+    display: flex; justify-content: center; align-items: center;
+    padding: 0 0 22px;
+    font-size: 0.8rem; color: var(--mist);
+  }
+  .herofoot a { text-decoration: none; padding: 12px 8px; margin: -12px -8px; transition: color .18s ease; }
+  .herofoot a:hover { color: var(--fog); }
+  .herofoot a:focus-visible { outline: 1.5px solid var(--phos); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .rise { animation: rise .65s var(--ease-out) backwards; }
+    .d1 { animation-delay: .08s } .d2 { animation-delay: .2s }
+    .d3 { animation-delay: .34s } .d4 { animation-delay: .5s }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+  }
+
+  /* ================= sections ================= */
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 28px; }
+  section.sec {
+    position: relative;
+    padding: clamp(64px, 11vh, 104px) 0;
+  }
+  section.sec::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 1px; background: var(--hair);
+    transform-origin: left center;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    section.sec.drawn::before { animation: draw .8s var(--ease-out) both; }
+    @keyframes draw { from { transform: scaleX(0); } }
+  }
+  h2 {
+    font-weight: 600;
+    font-size: clamp(1.55rem, 3.4vw, 2.15rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    color: var(--fog);
+    margin-bottom: 18px;
+    max-width: 26ch;
+  }
+  .sec p.body { color: var(--mist); max-width: 62ch; text-wrap: pretty; margin-bottom: 16px; }
+  .sec p.body strong { color: var(--fog); font-weight: 500; }
+
+  /* scroll reveal (base visible; hidden only pre-reveal under no-preference + JS) */
+  .reveal { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease-out, transform .6s var(--ease-out); }
+    .js .reveal.in { opacity: 1; transform: none; }
+  }
+
+  /* beat 1: the mini trace */
+  .demo-steps {
+    margin-top: 26px;
+    border: 0.5px solid var(--hair);
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 6px 18px;
+    max-width: 560px;
+  }
+  .demo-steps .row {
+    display: grid; grid-template-columns: 14px 1fr; gap: 12px; align-items: center;
+    padding: 11px 0;
+  }
+  .demo-steps .row + .row { border-top: 0.5px solid var(--hair); }
+  .demo-steps .mark {
+    width: 9px; height: 9px; border-radius: 2.5px;
+    border: 1.5px solid var(--hair2);
+    transform: rotate(45deg);
+    justify-self: center;
+    transition: background-color .3s ease, border-color .3s ease;
+  }
+  .demo-steps .row.on .mark { background: var(--phos); border-color: var(--phos); }
+  .demo-steps .row.done .mark { background: var(--hair2); border-color: var(--hair2); }
+  .demo-steps .lbl { font-size: 0.85rem; color: var(--mist); }
+  .demo-steps .row.on .lbl { color: var(--fog); }
+
+  /* beat 2: receipt chips */
+  .receipt {
+    margin-top: 26px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .receipt .chip {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--mist);
+    border: 0.5px solid var(--hair2); border-radius: 7px;
+    padding: 5px 11px;
+    transition: color .3s ease, border-color .3s ease;
+  }
+  .receipt .chip.ok { color: var(--fog); }
+  .reverify {
+    font-family: var(--sans); font-weight: 500; font-size: 0.78rem; color: var(--mist);
+    background: none; border: 0.5px solid var(--hair2); border-radius: 999px;
+    cursor: pointer; padding: 12px 18px; margin: -4px -2px;
+    transition: color .18s ease, border-color .18s ease, transform .45s var(--ease-spring);
+  }
+  .reverify:hover { color: var(--fog); border-color: var(--mist); transform: translateY(-1px); }
+  .reverify:focus-visible { outline: 1.5px solid var(--phos); outline-offset: 2px; }
+
+  /* beat 2: the show-the-work fold */
+  .fold { margin-top: 18px; max-width: 560px; }
+  .fold summary {
+    list-style: none; display: inline-flex; align-items: center; gap: 8px;
+    cursor: pointer;
+    font-weight: 500; font-size: 0.78rem; color: var(--mist);
+    border: 0.5px solid var(--hair2); border-radius: 999px;
+    padding: 12px 18px;
+    transition: color .18s ease, border-color .18s ease;
+  }
+  .fold summary::-webkit-details-marker { display: none; }
+  .fold summary:hover { color: var(--fog); border-color: var(--mist); }
+  .fold summary:focus-visible { outline: 1.5px solid var(--phos); outline-offset: 2px; }
+  .fold summary .tri { transition: transform .3s var(--ease-out); font-size: 0.7rem; }
+  .fold[open] summary .tri { transform: rotate(90deg); }
+  .fold .work {
+    font-family: var(--mono); font-size: 0.78rem; color: var(--mist);
+    background: var(--panel); border: 0.5px solid var(--hair); border-radius: 10px;
+    padding: 14px 16px; line-height: 1.8; margin-top: 12px;
+    overflow-x: auto;
+  }
+  .fold .work .g { color: var(--fog); }
+
+  /* beat 3: the confirm card */
+  .askcard {
+    margin-top: 26px;
+    border: 0.5px solid var(--hair);
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 18px 20px;
+    max-width: 560px;
+  }
+  .askcard .tag { font-weight: 500; font-size: 0.72rem; color: var(--mist); border: 0.5px solid var(--hair2); border-radius: 7px; padding: 3px 9px; display: inline-block; margin-bottom: 12px; }
+  .askcard p { font-size: 0.92rem; color: var(--fog); max-width: 52ch; }
+  .askcard p .col { font-family: var(--mono); font-size: 0.85em; }
+
+  /* proof rows */
+  .rows { list-style: none; margin-top: 10px; }
+  .rows li {
+    display: grid; grid-template-columns: 14px 1fr; gap: 14px; align-items: baseline;
+    padding: 16px 0;
+  }
+  .rows li + li { border-top: 0.5px solid var(--hair); }
+  .rows .mark {
+    width: 9px; height: 9px; border-radius: 2.5px;
+    background: var(--hair2);
+    transform: rotate(45deg) translateY(1px);
+    justify-self: center;
+  }
+  .rows p { color: var(--mist); max-width: 60ch; }
+  .rows p strong { color: var(--fog); font-weight: 500; }
+
+  /* close + footer */
+  .close { text-align: left; }
+  .close .mark { margin-bottom: 22px; display: block; }
+  .close h2 { margin-bottom: 12px; }
+  .close p.lead { color: var(--mist); max-width: 52ch; margin-bottom: 26px; text-wrap: pretty; }
+  .close form.capture { justify-content: flex-start; }
+  .close .form-msg { text-align: left; }
+  .myth { font-size: 0.82rem; color: var(--mist); margin-top: 30px; max-width: 48ch; }
+  footer.site {
+    border-top: 0.5px solid var(--hair);
+    margin-top: clamp(56px, 9vh, 88px);
+    padding: 24px 0 48px;
+    font-size: 0.8rem; color: var(--mist);
+    display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between;
+  }
+  footer.site a { text-decoration: none; padding: 12px 6px; margin: -12px -6px; }
+  footer.site a:hover { color: var(--fog); }
+  footer.site a:focus-visible { outline: 1.5px solid var(--phos); outline-offset: 2px; }
+  footer.site .cr { font-family: var(--mono); font-size: 0.72rem; }
+
+  @media (max-width: 720px) {
+    nav.pill a { padding: 10px 11px; }
+    .bar { padding-top: 16px; }
+    .intro { flex-direction: column; gap: 8px; padding-top: 24px; }
+    .intro .stamp { order: -1; }
+    .center { padding: 24px 0 28px; }
+  }
+  @media (max-width: 480px) {
+    nav.pill a:nth-child(2) { display: none; }
+  }
+  @media (max-width: 360px) {
+    .lock span { display: none; }
+  }
+  /* reduced motion: color/opacity feedback stays, movement stops */
+  @media (prefers-reduced-motion: reduce) {
+    button.go, .reverify { transition: color .18s ease, border-color .18s ease, opacity .2s ease; }
+    button.go:hover, button.go:active, .reverify:hover { transform: none; }
+    .fold summary .tri { transition: none; }
+  }
 </style>
 </head>
 <body>
+
 <canvas id="rain" aria-hidden="true"></canvas>
+<div class="field" aria-hidden="true"></div>
+
 <main>
-  <div class="lock">
-    <svg width="26" height="26" viewBox="0 0 37 37" role="img" aria-label="Chausar mark" xmlns="http://www.w3.org/2000/svg">
+<div class="hero">
+  <header class="bar">
+    <a class="lock" href="/" aria-label="chausar home">
+      <svg width="22" height="22" viewBox="0 0 37 37" role="img" aria-label="Chausar mark" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="18" height="18" rx="4.5" fill="#E8EBEE"/>
+        <rect x="19" y="19" width="18" height="18" rx="4.5" fill="#46F09B"/>
+      </svg>
+      <span>chausar</span>
+    </a>
+    <nav class="pill" aria-label="site">
+      <a href="#work">What it does</a>
+      <a href="#proof">Why it holds up</a>
+      <a href="mailto:info@chausar.co.in">Contact</a>
+    </nav>
+  </header>
+
+    <div class="intro">
+      <p class="say rise d1">A queryable, auditable record of what your company decided: when, by whom, and on what stated reasoning.</p>
+      <p class="stamp rise d1">built in india · 2026</p>
+    </div>
+
+    <div class="center">
+      <p class="eyebrow rise d2">Decision intelligence for organisations</p>
+      <h1>
+        <span class="line rise d3">Organisations forget.</span>
+        <span class="line rise d3 resolve">
+          <span>We're building the memory.</span>
+          <span class="lit" aria-hidden="true">We're building the memory.</span>
+        </span>
+      </h1>
+      <form class="capture rise d4" action="https://formspree.io/f/mykaevlg" method="POST">
+        <input type="email" name="email" placeholder="you@company.com" required aria-label="Email address">
+        <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="go" type="submit">Notify me</button>
+      </form>
+      <p class="form-msg" role="status"></p>
+      <p class="hint rise d4">Leave an email. We'll write when there's something to show.</p>
+    </div>
+
+  <div class="herofoot">
+    <a href="#work">↓ What it does</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+<section class="sec" id="work">
+  <div class="reveal">
+    <h2>Ask anything. Watch it compute.</h2>
+    <p class="body">Type a question the way you'd ask a colleague: why did margin fall, what changed, what happens next quarter if input costs stay high. The system breaks it into computations and <strong>runs them in front of you</strong>, step by step, in plain language.</p>
+    <div class="demo-steps" id="ministeps">
+      <div class="row"><span class="mark" aria-hidden="true"></span><span class="lbl">Splitting the change into price, volume, and mix</span></div>
+      <div class="row"><span class="mark" aria-hidden="true"></span><span class="lbl">Fitting the cost drivers</span></div>
+      <div class="row"><span class="mark" aria-hidden="true"></span><span class="lbl">Checking every number against the trace</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="reveal">
+    <h2>Every answer carries its receipt.</h2>
+    <p class="body">Each number traces to a recorded computation: the recipe, the query, the exact data snapshot it ran on. Ask again in a month and it <strong>replays to the same numbers</strong>. And when a question can't be answered honestly from the data, it refuses, and names the reason.</p>
+    <div class="receipt" id="receipt">
+      <span class="chip">a41f…9c</span>
+      <span class="chip">7c02…e1</span>
+      <span class="chip">d98a…44</span>
+      <button class="reverify" id="reverify" type="button">↻ Re-verify</button>
+    </div>
+    <details class="fold">
+      <summary><span class="tri" aria-hidden="true">▶</span>Show the work: an example of the receipt every answer carries</summary>
+      <div class="work">
+        example receipt<br>
+        recipe · <span class="g">decompose(margin, q2→q3) → fit(drivers) → scenario(hold-high)</span><br>
+        query · <span class="g">margin_by_quarter(q2→q3) · params recorded</span><br>
+        snapshot · <span class="g">sales_fy26 · sha 9e12…c4 · 2026-06-30</span><br>
+        caveat · <span class="g">projection assumes the fitted milk coefficient holds</span>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="reveal">
+    <h2>Connect your data. It asks before it assumes.</h2>
+    <p class="body">This is the part we're building right now. Drop in a messy export or connect the systems you already run: it will profile every column, draft what each one means, and bring its open questions to you instead of guessing silently. Your analyst confirms; <strong>only then does it answer on your data.</strong></p>
+    <div class="askcard">
+      <span class="tag">In build · an open question, as it will appear</span>
+      <p>The <span class="col">amt</span> column looks tax-inclusive. Confirm how to treat it before I count it as revenue?</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="proof">
+  <div class="reveal">
+    <h2>Why it holds up</h2>
+    <ul class="rows" role="list">
+      <li><span class="mark" aria-hidden="true"></span><p><strong>Tested before trusted.</strong> Every capability faces hundreds of hostile questions before it ships; confidently-wrong answers are treated as the one unforgivable failure.</p></li>
+      <li><span class="mark" aria-hidden="true"></span><p><strong>It refuses to fabricate.</strong> No data, no answer. The refusal names what's missing and offers the nearest question it can answer.</p></li>
+      <li><span class="mark" aria-hidden="true"></span><p><strong>Replayable by construction.</strong> Answers are recorded computations, so anyone can re-run yesterday's answer and get yesterday's numbers.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec close">
+  <div class="reveal">
+    <svg class="mark" width="40" height="40" viewBox="0 0 37 37" role="img" aria-label="Chausar mark" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="18" height="18" rx="4.5" fill="#E8EBEE"/>
       <rect x="19" y="19" width="18" height="18" rx="4.5" fill="#46F09B"/>
     </svg>
-    <span>chausar</span>
-  </div>
-
-  <h1>Decision intelligence for organisations</h1>
-
-  <p class="myth">A kingdom, lost over dice. The lesson outlived the kingdom.</p>
-
-  <p class="status">Built in India<span class="dot">·</span>2026</p>
-
-  <div>
-    <p class="field-note">Leave an email. We'll write when there's something to show.</p>
-    <form id="capture" action="https://formspree.io/f/mykaevlg" method="POST">
+    <h2>Leave an email</h2>
+    <p class="lead">We'll work with a small number of consumer businesses first. If that could be you, or you just want to follow along, tell us where to write.</p>
+    <form class="capture" action="https://formspree.io/f/mykaevlg" method="POST">
       <input type="email" name="email" placeholder="you@company.com" required aria-label="Email address">
       <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <button type="submit">Notify me</button>
+      <button class="go" type="submit">Notify me</button>
     </form>
-    <p class="form-msg" id="form-msg" role="status"></p>
+    <p class="form-msg" role="status"></p>
+    <p class="myth">Chausar is the dice game that cost a kingdom. The lesson outlived the kingdom.</p>
   </div>
+</section>
+
+</div>
 </main>
 
-<footer>
-  <span>© 2026 Chausar AI · chausar.co.in</span>
-  <span>Business enquiries <a href="mailto:info@chausar.co.in">info@chausar.co.in</a></span>
+<div class="wrap footwrap">
+<footer class="site">
+  <span class="cr">© 2026 chausar ai · chausar.co.in</span>
+  <span>Business enquiries <a href="mailto:info@chausar.co.in">info@chausar.co.in</a> · Careers <a href="mailto:careers@chausar.co.in">careers@chausar.co.in</a></span>
 </footer>
+</div>
 
 <script>
-  // logo-tile rain: a bright fog "decision" head falling into a trail of phosphor "consequence" tiles
+  document.documentElement.classList.add('js');
+
+  // atmosphere: sparse logo-tile rain (founder-approved pattern from the live site)
   (function () {
     var canvas = document.getElementById('rain');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
     var COURT = '#070809', PHOS = '#46F09B', FOG = '#E8EBEE';
-    var step = 42, tile = 14, rad = 4, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var step = 46, tile = 13, rad = 4, dpr = Math.min(window.devicePixelRatio || 1, 2);
     var cols = 0, drops = [];
     function resize() {
       canvas.width = Math.floor(innerWidth * dpr);
@@ -189,52 +529,133 @@
       ctx.closePath(); ctx.fill();
     }
     function frame() {
-      ctx.fillStyle = 'rgba(7,8,9,0.09)';            // fade prior tiles toward court -> trailing dim
+      ctx.fillStyle = 'rgba(7,8,9,0.09)';
       ctx.fillRect(0, 0, innerWidth, innerHeight);
       for (var i = 0; i < cols; i++) {
         var x = i * step + (step - tile) / 2, y = drops[i] * step;
-        if (Math.random() < 0.06) { ctx.globalAlpha = 0.55; ctx.fillStyle = FOG; }   // the decision
-        else { ctx.globalAlpha = 0.3; ctx.fillStyle = PHOS; }                         // the consequence
+        if (Math.random() < 0.05) { ctx.globalAlpha = 0.28; ctx.fillStyle = FOG; }
+        else { ctx.globalAlpha = 0.2; ctx.fillStyle = PHOS; }
         rounded(x, y, tile, rad);
         ctx.globalAlpha = 1;
         if (y > innerHeight && Math.random() > 0.985) drops[i] = 0;
         drops[i]++;
       }
     }
+    var lastW = 0;
+    function onResize() {
+      // mobile URL-bar collapse fires height-only resizes: keep the drops, just extend the canvas
+      if (innerWidth === lastW) {
+        canvas.height = Math.floor(innerHeight * dpr);
+        canvas.style.height = innerHeight + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = COURT; ctx.fillRect(0, 0, innerWidth, innerHeight);
+        return;
+      }
+      lastW = innerWidth;
+      resize();
+    }
+    lastW = innerWidth;
     resize();
-    addEventListener('resize', resize);
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;  // static court, no rain
+    addEventListener('resize', onResize);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // static court, no rain
     var last = 0;
-    (function loop(t) { if (t - last > 90) { frame(); last = t; } requestAnimationFrame(loop); })(0);
+    (function loop(t) { if (t - last > 95) { frame(); last = t; } requestAnimationFrame(loop); })(0);
   })();
 
+  // scroll reveal + hairline draw-in
   (function () {
-    var form = document.getElementById('capture');
-    var msg = document.getElementById('form-msg');
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      var btn = form.querySelector('button');
-      btn.disabled = true;
-      msg.textContent = '';
-      msg.classList.remove('error');
-      try {
-        var res = await fetch(form.action, {
-          method: 'POST',
-          body: new FormData(form),
-          headers: { 'Accept': 'application/json' }
-        });
-        if (res.ok) {
-          form.reset();
-          msg.textContent = 'Noted. We will be in touch.';
-        } else {
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var els = document.querySelectorAll('.reveal');
+    var secs = document.querySelectorAll('section.sec');
+    if (reduce || !('IntersectionObserver' in window)) {
+      els.forEach(function (e) { e.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(function (e) { io.observe(e); });
+    var io2 = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('drawn'); io2.unobserve(en.target); }
+      });
+    }, { threshold: 0.01 });
+    secs.forEach(function (s) { io2.observe(s); });
+  })();
+
+  // beat 1: one-shot mini cascade when in view; phosphor is transient
+  (function () {
+    var box = document.getElementById('ministeps');
+    if (!box) return;
+    var rows = Array.prototype.slice.call(box.querySelectorAll('.row'));
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function play() {
+      if (reduce) { rows.forEach(function (r) { r.classList.add('done'); }); return; }
+      var t = 250;
+      rows.forEach(function (r) {
+        setTimeout(function () { r.classList.add('on'); }, t);
+        t += 560;
+        setTimeout(function () { r.classList.remove('on'); r.classList.add('done'); }, t);
+      });
+    }
+    if (!('IntersectionObserver' in window)) { play(); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { play(); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.4 });
+    io.observe(box);
+  })();
+
+  // beat 2: re-verify flashes the chips ok, one shot per click
+  (function () {
+    var btn = document.getElementById('reverify');
+    if (!btn) return;
+    var chips = Array.prototype.slice.call(document.querySelectorAll('#receipt .chip'));
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var timers = [];
+    chips.forEach(function (c) { c.dataset.base = c.textContent; });
+    btn.addEventListener('click', function () {
+      timers.forEach(clearTimeout); timers = [];
+      chips.forEach(function (c) { c.classList.remove('ok'); c.textContent = c.dataset.base; });
+      var t = reduce ? 0 : 180;
+      chips.forEach(function (c, i) {
+        timers.push(setTimeout(function () { c.classList.add('ok'); c.textContent = c.dataset.base + ' ✓'; }, t * (i + 1)));
+      });
+    });
+  })();
+
+  // email capture (both forms)
+  (function () {
+    document.querySelectorAll('form.capture').forEach(function (form) {
+      var msg = form.parentElement.querySelector('.form-msg');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var btn = form.querySelector('button');
+        btn.disabled = true;
+        msg.textContent = '';
+        msg.classList.remove('error');
+        try {
+          var res = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'Accept': 'application/json' }
+          });
+          if (res.ok) {
+            form.reset();
+            msg.textContent = "Noted. We'll be in touch.";
+          } else {
+            msg.textContent = 'Something went wrong. Write to us instead: info@chausar.co.in';
+            msg.classList.add('error');
+          }
+        } catch (err) {
           msg.textContent = 'Something went wrong. Write to us instead: info@chausar.co.in';
           msg.classList.add('error');
         }
-      } catch (err) {
-        msg.textContent = 'Something went wrong. Write to us instead: info@chausar.co.in';
-        msg.classList.add('error');
-      }
-      btn.disabled = false;
+        btn.disabled = false;
+      });
     });
   })();
 </script>
