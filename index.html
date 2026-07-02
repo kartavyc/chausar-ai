@@ -54,14 +54,14 @@
   a { color: inherit; }
   .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
-  /* ---------- atmosphere: tile rain + phosphor field ---------- */
-  #rain { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: .6; display: block; pointer-events: none; }
+  /* ---------- atmosphere: interactive dot field + faint vignette ---------- */
+  #dotfield { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none; }
   .field {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background:
-      radial-gradient(680px 420px at 12% -6%, rgba(70,240,155,0.05), transparent 68%),
-      radial-gradient(760px 520px at 96% 34%, rgba(232,235,238,0.04), transparent 70%),
-      radial-gradient(600px 460px at 30% 108%, rgba(232,235,238,0.035), transparent 72%);
+      radial-gradient(680px 420px at 12% -6%, rgba(232,235,238,0.04), transparent 68%),
+      radial-gradient(760px 520px at 96% 34%, rgba(232,235,238,0.035), transparent 70%),
+      radial-gradient(600px 460px at 30% 108%, rgba(232,235,238,0.03), transparent 72%);
   }
   main, .footwrap { position: relative; z-index: 1; }
 
@@ -362,8 +362,8 @@
 </head>
 <body>
 
-<canvas id="rain" aria-hidden="true"></canvas>
 <div class="field" aria-hidden="true"></div>
+<canvas id="dotfield" aria-hidden="true"></canvas>
 
 <main>
 <div class="hero">
@@ -500,66 +500,90 @@
 <script>
   document.documentElement.classList.add('js');
 
-  // atmosphere: sparse logo-tile rain (founder-approved pattern from the live site)
+  // dot field: a dim grid that displaces + brightens toward the pointer, eases back, static when idle
   (function () {
-    var canvas = document.getElementById('rain');
+    var canvas = document.getElementById('dotfield');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
-    var COURT = '#070809', PHOS = '#46F09B', FOG = '#E8EBEE';
-    var step = 46, tile = 13, rad = 4, dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var cols = 0, drops = [];
-    function resize() {
-      canvas.width = Math.floor(innerWidth * dpr);
-      canvas.height = Math.floor(innerHeight * dpr);
-      canvas.style.width = innerWidth + 'px';
-      canvas.style.height = innerHeight + 'px';
+    var PHOS = [70, 240, 155], REST = [94, 102, 96];   // phosphor / --dim
+    var STEP = 30, R = 132, MAXPUSH = 15, BASE_R = 1.3, MAX_R = 3;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var dots = [], W = 0, H = 0;
+    var mx = -9999, my = -9999, moved = -9999, running = false;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function build() {
+      W = innerWidth; H = innerHeight;
+      canvas.width = Math.floor(W * dpr);
+      canvas.height = Math.floor(H * dpr);
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cols = Math.ceil(innerWidth / step);
-      drops = [];
-      for (var i = 0; i < cols; i++) drops[i] = Math.floor(Math.random() * (innerHeight / step));
-      ctx.fillStyle = COURT; ctx.fillRect(0, 0, innerWidth, innerHeight);
+      dots = [];
+      var ox = ((W % STEP) + STEP) / 2, oy = ((H % STEP) + STEP) / 2;
+      for (var gy = oy; gy < H; gy += STEP)
+        for (var gx = ox; gx < W; gx += STEP)
+          dots.push({ bx: gx, by: gy, x: gx, y: gy });
     }
-    function rounded(x, y, s, r) {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + s, y, x + s, y + s, r);
-      ctx.arcTo(x + s, y + s, x, y + s, r);
-      ctx.arcTo(x, y + s, x, y, r);
-      ctx.arcTo(x, y, x + s, y, r);
-      ctx.closePath(); ctx.fill();
-    }
-    function frame() {
-      ctx.fillStyle = 'rgba(7,8,9,0.09)';
-      ctx.fillRect(0, 0, innerWidth, innerHeight);
-      for (var i = 0; i < cols; i++) {
-        var x = i * step + (step - tile) / 2, y = drops[i] * step;
-        if (Math.random() < 0.05) { ctx.globalAlpha = 0.28; ctx.fillStyle = FOG; }
-        else { ctx.globalAlpha = 0.2; ctx.fillStyle = PHOS; }
-        rounded(x, y, tile, rad);
-        ctx.globalAlpha = 1;
-        if (y > innerHeight && Math.random() > 0.985) drops[i] = 0;
-        drops[i]++;
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      var settled = true;
+      for (var i = 0; i < dots.length; i++) {
+        var d = dots[i], tx = d.bx, ty = d.by, prox = 0;
+        var ddx = d.bx - mx, ddy = d.by - my;
+        var dist = Math.sqrt(ddx * ddx + ddy * ddy);
+        if (dist < R) {
+          prox = (R - dist) / R;
+          var f = prox * prox, inv = dist || 0.0001;
+          tx = d.bx + (ddx / inv) * f * MAXPUSH;
+          ty = d.by + (ddy / inv) * f * MAXPUSH;
+        }
+        d.x += (tx - d.x) * 0.18;
+        d.y += (ty - d.y) * 0.18;
+        if (Math.abs(d.x - d.bx) > 0.25 || Math.abs(d.y - d.by) > 0.25) settled = false;
+        var r = BASE_R + (MAX_R - BASE_R) * prox;
+        var a = 0.4 + 0.45 * prox;
+        var cr = (REST[0] + (PHOS[0] - REST[0]) * prox) | 0;
+        var cg = (REST[1] + (PHOS[1] - REST[1]) * prox) | 0;
+        var cb = (REST[2] + (PHOS[2] - REST[2]) * prox) | 0;
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + a + ')';
+        ctx.arc(d.x, d.y, r, 0, 6.2832);
+        ctx.fill();
       }
+      return settled;
     }
-    var lastW = 0;
-    function onResize() {
-      // mobile URL-bar collapse fires height-only resizes: keep the drops, just extend the canvas
-      if (innerWidth === lastW) {
-        canvas.height = Math.floor(innerHeight * dpr);
-        canvas.style.height = innerHeight + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.fillStyle = COURT; ctx.fillRect(0, 0, innerWidth, innerHeight);
-        return;
-      }
-      lastW = innerWidth;
-      resize();
+
+    function loop(t) {
+      var settled = draw();
+      if (!settled || (t - moved) < 500) requestAnimationFrame(loop);
+      else { running = false; draw(); }
     }
-    lastW = innerWidth;
-    resize();
-    addEventListener('resize', onResize);
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // static court, no rain
-    var last = 0;
-    (function loop(t) { if (t - last > 95) { frame(); last = t; } requestAnimationFrame(loop); })(0);
+    function kick() { if (!running) { running = true; requestAnimationFrame(loop); } }
+    function reset() { mx = my = -9999; moved = performance.now(); kick(); }
+
+    build();
+    draw();                                   // static dim grid at load
+
+    var rt;
+    addEventListener('resize', function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () { build(); draw(); }, 120);
+    });
+
+    if (reduce) return;                        // static grid, no interaction
+
+    window.addEventListener('pointermove', function (e) {
+      mx = e.clientX; my = e.clientY; moved = performance.now(); kick();
+    }, { passive: true });
+    window.addEventListener('pointerdown', function (e) {
+      mx = e.clientX; my = e.clientY; moved = performance.now(); kick();
+    }, { passive: true });
+    window.addEventListener('pointerup', function (e) { if (e.pointerType === 'touch') reset(); }, { passive: true });
+    window.addEventListener('pointercancel', reset, { passive: true });
+    document.addEventListener('mouseleave', reset);
+    window.addEventListener('blur', reset);
   })();
 
   // scroll reveal + hairline draw-in
